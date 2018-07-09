@@ -3,7 +3,7 @@ OS for a robot named "Skipper" - Mobile LiDAR Communication Robot <br>
 By: Samuel Barr & Eli McGalliard
 
 ## Design and Sensors
-This robot was built to be lightweight and smaller than most with numberous sensors to help it figure out its enviornment.
+This robot was built to be lightweight and smaller than most with numerous sensors to help it figure out its enviornment.
 Sensors include:
  - Six  (6) line tracking sensors
  - One (1) Ultrasonic sensor
