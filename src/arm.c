@@ -7,10 +7,7 @@
 #define ELBOW_POT 8
 #define CLAW 6
 
-void clawSet(int speed) { motorSet(CLAW, speed); }
-void elbowSet(int speed) { motorSet(ELBOW, -speed); }
-
-
+/********************** DEPRICATED *********************/
 void clawGrab() {
   motorSet(CLAW, -30);
   wait(1000);

@@ -12,50 +12,54 @@ void chassisSet(int leftSpeed, int rightSpeed) {
   motorSet(RIGHTDRIVE, rightSpeed);
 }
 
-void axisTurn(int speed, int right)
-{
+void axisTurn(int speed, int right) {
   int limit = 330;
+  resetEncoders();
 
-  encoderReset(leftEncoder);
-  encoderReset(rightEncoder);
-
-  if (!right)
-  {
+  if (!right) {
     limit = 340;
     chassisSet(-speed, speed);
   }
-  else
-  {
+  else {
     limit = 370;
     chassisSet(speed, -speed);
   }
 
-  while(abs(encoderGet(leftEncoder)) <= limit ||
-        abs(encoderGet(rightEncoder)) <= limit);
+  while(abs(getLeftEnc()) <= limit ||
+        abs(getRightEnc()) <= limit);
 
   chassisSet(0, 0);
 }
 
-void leftMotorSet(int speed)
-{
+void leftMotorSet(int speed) {
   motorSet(LEFTDRIVE, -speed);
   lastSpeed = currentSpeed;
   currentSpeed = speed;
 }
 
-void rightMotorSet(int speed)
-{
+void rightMotorSet(int speed) {
   motorSet(RIGHTDRIVE, speed);
   lastSpeed = currentSpeed;
   currentSpeed = speed;
 }
 
-int getRightSpeed()
-{
+int getRightSpeed() {
   return motorGet(RIGHTDRIVE);
 }
 
-int getLeftSpeed()
-{
+int getLeftSpeed() {
   return -motorGet(LEFTDRIVE);
+}
+
+int getLeftEnc() {
+  return encoderGet(leftEncoder);
+}
+
+int getRightEnc() {
+  return encoderGet(rightEncoder);
+}
+
+void resetEncoders() {
+  encoderReset(leftEncoder);
+  encoderReset(rightEncoder);
 }

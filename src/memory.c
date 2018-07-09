@@ -2,6 +2,16 @@
 #include "lineTrack.h"
 #include "main.h"
 
+/**
+ * Adds a path 'stamp' to the tail of the stamp linked list
+ * @param headRef reference to the head pointer
+ * @param left speed
+ * @param right speed
+ * @param ti time (in milliseconds) of speed
+ */
+void addStamp(struct StampNode** headRef, int left, int right, int ti);
+
+
 struct StampNode {
   int leftSpeed;
   int rightSpeed;

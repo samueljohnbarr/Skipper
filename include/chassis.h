@@ -37,5 +37,19 @@ int getRightSpeed();
  */
 int getLeftSpeed();
 
+/**
+ * @return left encoder value
+ */
+int getLeftEnc();
+
+/**
+ * @return right encoder value
+ */
+int getRightEnc();
+
+/**
+ * Resets left and right encoders
+ */
+ void resetEncoders();
 
 #endif // _CHASSIS_H_

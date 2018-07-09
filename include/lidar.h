@@ -1,22 +1,11 @@
 #ifndef _LIDAR_H_
 #define _LIDAR_H_
 
-#define BAUD 115200
-
-#define REQUEST 0xA5
-#define STOP 0x25
-#define RESET 0x40
-#define SCAN 0x20
 #define SCAN_DATA_LEN 5
-#define EXPRESS_SCAN 0x82
 #define EXPRESS_SCAN_DATA_LEN 84
-#define FORCE_SCAN 0x21
 #define FORCE_SCAN_DATA_LEN 5
-#define GET_INFO 0x50
 #define GET_INFO_LEN 20
-#define GET_HEALTH 0x52
 #define HEALTH_DATA_LEN 3
-#define GET_SAMPLERATE 0x59
 #define GET_SAMPLERATE_LEN 4
 
 #define HEADER_LENGTH 7
@@ -36,7 +25,7 @@ void lidarExpressScan();
 
 int initLidar();
 
-char * lidarGetHealth();
+void lidarGetHealth();
 
 void lidarGetSamplerate(char * array);
 

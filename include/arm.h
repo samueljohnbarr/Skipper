@@ -1,21 +1,21 @@
 #ifndef _ARM_H_
 #define _ARM_H_
-
+/********************** DEPRICATED *********************/
 /**
  * Sets the claw motor speed
  * @param speed to set
  */
- void clawSet(int speed);
+void clawSet(int speed);
 
 /**
  * Closes an open claw
  */
- void clawGrab();
+void clawGrab();
 
- /**
-  * Opens a closed claw
-  */
-  void clawRelease();
+/**
+ * Opens a closed claw
+ */
+void clawRelease();
 
 /**
  * Sets the shoulder motor to a certain speed
@@ -37,7 +37,7 @@ void elbowSet(int speed);
 /**
  * Sets the elbow to specified potentometer setting
  */
- void elbowPotSet(int pot, int speed);
+void elbowPotSet(int pot, int speed);
 
 /**
  * Sets all arm motors (shoulder & elbow) to a certain speed
@@ -58,17 +58,16 @@ int getElbowPot();
 /**
  * Raises arm to high position
  */
- void raiseArm();
+void raiseArm();
 
- /**
-  * Extends the arm at optimum grabbing position
-  */
- void extendArm();
+/**
+ * Extends the arm at optimum grabbing position
+ */
+void extendArm();
 
- /**
-  * Folds the arm to resting point
-  */
-  void foldArm();
-
+/**
+ * Folds the arm to resting point
+ */
+void foldArm();
 
 #endif //_ARM_H_

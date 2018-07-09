@@ -3,7 +3,18 @@
 #include "tools.h"
 #include <math.h>
 
-// char * ans;
+#define BAUD 115200
+
+#define REQUEST 0xA5
+#define STOP 0x25
+#define RESET 0x40
+#define SCAN 0x20
+#define EXPRESS_SCAN 0x82
+#define FORCE_SCAN 0x21
+#define GET_INFO 0x50
+#define GET_HEALTH 0x52
+#define GET_SAMPLERATE 0x59
+
 char *header;
 char *data;
 int lastDistance;
@@ -64,26 +75,23 @@ void lidarExpressScan() {
   fputc(0x00, uart1);
   fputc(0x22, uart1);
 }
-/*
-char * lidarGetHealth() {
+
+void lidarGetHealth() {
   lidarRequest();
-  delay(2);
   fputc(GET_HEALTH, uart1);
   delay(2);
-  return responseWait(HEALTH_DATA_LEN);
+
 }
 
-char * lidarGetInfo() {
+void lidarGetInfo() {
   lidarRequest();
   fputc(GET_INFO, uart1);
   delay(1);
-  return responseWait(GET_INFO_LEN);
 }
-*/
+
 void lidarGetSamplerate(char *r_Array) {
   lidarRequest();
   fputc(GET_SAMPLERATE, uart1);
-  responseWait(GET_SAMPLERATE, r_Array, GET_SAMPLERATE_LEN);
   delay(1);
 }
 

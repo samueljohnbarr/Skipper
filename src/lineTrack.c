@@ -5,11 +5,47 @@
 #include "sensors.h"
 #include "transfer.h"
 
+/**
+ * Detects where the line is in relation to the robot and
+ * returns a number that reflects that error.
+ * If it detects a right angle, it calls the rightAngle function,
+ * else it calls the Proportional-Derivative (PD) function
+ */
+void errorCorrection();
+
+/**
+ * Checks values of all sensors and returns an integer
+ * representing the sensors above threshold.
+ * Handles context
+ */
+int sensorDetection();
+
+/**
+ * Returns true if conditions are met to change context
+ */
+int checkContext(int sensors);
+
+/**
+ * Proportional-Derivative Control
+ * Corrects motor speeds on both motors depending on
+ * how large the error is, and the time it took for errors to change.
+ */
+void PD(int error);
+
+/**
+ * Corrects the robot in the event of a right angle
+ */
+void rightAngle(int right);
+
+/**
+ * Sets a buffer for line tracking
+ * Created for multicolored surfaces
+ */
+void setThreshold();
+
+
 static float KP = 0.15;
 static float KD = 0.6;
-
-//Can probably remove?
-int whiteTape = true;
 
 int baseSpeed = 45; //60
 int lastError;
@@ -28,35 +64,23 @@ int threshAvgCount = 2;
 int *ct;
 int track = true;
 int reps = 0;
-//int inRangeOnce = 1;
 
-void autonomous() {
-  // Wait for debounce
-  delay(500);
-  // errorCorrection();
+void lineTrack() {
   chassisSet(40, 40);
-  // goStraight();
-  // setThreshold();
+  //Set line to track
   while (track && (reps < 100)) {
     setThreshold();
     reps++;
   }
   reps = 0;
+  //Track the line
   while (track) {
-    // Line track
     errorCorrection();
     if (isInRange()) {
       chassisSet(0, 0);
-      //if (inRangeOnce) {
-        //printf("In Range.");
-        //inRangeOnce--;
-      //}
       delay(300);
-      if (joystickGetDigital(CONTROLLER, RIGHT_BUTT_SET, JOY_DOWN))
-        // backUpProcedure();
-        // operatorControl();
-        track = false;
     }
+    //Break control
     if (joystickGetDigital(CONTROLLER, RIGHT_BUTT_SET, JOY_DOWN)) {
       track = false;
       delay(500);
