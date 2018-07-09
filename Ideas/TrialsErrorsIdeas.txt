@@ -1,0 +1,187 @@
+/**************************************************************\
+|**********************    July 06, 2018    *********************|
+\**************************************************************/
+Wireless Transmission
+-Split computer monitors for dual work on both robots instead of
+ a joint effort on one
+-Sam will work on the transmission side and Eli will work on the
+ receiving side
+-Once both sides are properly debugged, we will implement both sides
+ to both bots and work further from there
+-Created a wireless protocol text file to work from
+
+ /**************************************************************\
+|**********************    July 05, 2018    *********************|
+ \**************************************************************/
+
+Wireless Transmission
+- Practice soldering more so that we are able to solder wires to
+the wireless transmitter.
+- Further establish protocols for transmission?
+-
+
+ /**************************************************************\
+|**********************    July 02, 2018    *********************|
+ \**************************************************************/
+
+Wireless Transmission Layout
+- Made wireless transmission methods more abstract and privatized others
+- Developed a handshake transmit protocol to establish communication between the
+  two devices and for the calling device to transmit
+- Implemented a state enum to keep track of the sending/revieving State
+- Practiced soldering :)
+
+ /**************************************************************\
+|**********************    June 28, 2018    *********************|
+ \**************************************************************/
+
+Wireless Transmission
+ - Reduced the size of main and encapsulated the variations. Set a
+ variable to decide if a signal would be transmitted or if the
+ signal from the controller would control the primary robot. Signals
+ will be sent with the new methods that were written in the wireless
+ class and follow the established protocols when actively transmitting.
+
+ - Need a way to figure out if the robot is currently receiving a
+ signal and to determine when to actually act on that signal, depending
+ on what message is being relayed. To familiarize ourselves with the
+ transmitter we are going to attempt to control the second robot
+ by giving commands to the first robot. Later on we will relay
+ information about the environment that is gathered from the Lidar.
+
+
+ /**************************************************************\
+|**********************    June 26, 2018    *********************|
+ \**************************************************************/
+
+Today's Goals:
+  - Get started on wireless transmission between robots. Set up
+  the classes and the methods as well as establish protocols for
+  the robots to follow.
+  -Start Byte- C3
+  -Controller Cmd- 0x15
+
+
+ /**************************************************************\
+|**********************    June 25, 2018    *********************|
+ \**************************************************************/
+
+- Tried to test the RPLidar's using SlamTec Robostudio as well as
+the FRAME_GRABBER.exe in order to diagnose issues regarding serial
+communication. The computer was not detecting the RPLidar through
+the COM ports which lead to other questions and issues. This, so
+far, has not provided any insight into where our issues lie.
+
+
+ /**************************************************************\
+|**********************    June 22, 2018    *********************|
+ \**************************************************************/
+
+Problems We Are Facing
+  1. Reading from the UART Serial Port.
+    - We are able to read the header from response packets given the
+    number of bytes per header. This indicates our BAUD rate and
+    reading of serial port in general seems to be correct. We aren't
+    able to read any other data after that consistently and/or
+    accurately.
+  Causes
+   1. Lidar is not sending reliable data when it comes to response
+    packets separate from the header, i.e. angle, distance, quality,
+    check sums. Could be an issue with electronic components on the
+    circuit board itself?
+   2. Response after header is either lacking characters or providing
+    too many characters which would skew our perceived expectation of
+    where we currently are on the response packet, i.e. we are checking
+    the quality of the S !S or C bits when in reality the character
+    we looking at does not contain either of those.
+
+
+ /**************************************************************\
+|**********************    June 20, 2018    *********************|
+ \**************************************************************/
+
+Today's Goals:
+-Start implementation of Express Scan.  This scan protocol has many more
+identifiers which make it easier to denote when data packets start and end
+
+General Notes:
+-The express scan response packet is much more dense, and will take a lot
+more time to develop a decoding algorithm than the normal scan
+
+
+ /**************************************************************\
+|**********************    June 19, 2018    *********************|
+ \**************************************************************/
+
+Previous Days Notes:
+
+-Rewrote how we collect data from the Lidar; we now take into consideration
+the time between reads, and wait enough time for the lidar to send correct data
+**Retrieved info still has problems - seems as though data is getting offset
+  at various intervals that is not consistent with the datasheet.
+
+Today's Goals:
+
+-Determine if there is any consistency in data retrieval errors between
+ scans and mitigate those issues
+
+ General Notes:
+ -Fixed an offset issue with reading in the data
+ -While the data is much easier to read on screen, it's easy to see that
+  there are still offset issues occurring - just not as much
+
+
+ /***************************************************************\
+|**********************    June 15, 2018    **********************|
+ \***************************************************************/
+
+Today's Goals:
+
+    - Parse through raw data to find bytes that match expected values.
+    - Attempt to attain a one-to-one ratio of desired number of data
+    points to reliable number of data points.
+    -
+
+Today's Problems:
+
+    -
+
+General Notes:
+
+    - Decode is successful. New plan is to parse through
+    the raw data to check for bits for integrity and
+    values that match expected outcomes for S, !S, and C.
+
+
+ /***************************************************************\
+|**********************    June 14, 2018    **********************|
+ \***************************************************************/
+
+Today's Goals:
+
+  - Successfully decode response packets from SCAN
+  - Produce more reliable responses
+
+Scan Response Packet:
+_____________________________________________________________________________________
+| Quality | !S | S | Angle[6:0] | C | Angle[14:7] | Distance [7:0] | Distance [15:8] |
+|      Byte 1      |     Byte 2     |   Byte 3    |    Byte 4      |      Byte 5     |
+
+Today's Problems:
+
+  - Issues with reading raw data correctly
+    - Added delays between requests and reads to mitigate this
+  - Inconsistent header values
+    - Try to stop and then start the scans every time, so a new header
+    would be sent out every time?
+
+
+General Notes:
+
+  - More accepted values per number of points requested. Unsure whether
+  or not the data is valid ... same angles with different distances.
+    - Each response comes with a quality byte, but we're unsure how to implement
+     quality testing with each scan response.
+  - Browsed through the RPLidar SDK for hints or tips. Nothing to be found.
+  All hope lost.
+  - Tomorrow try allocating and de-allocating memory one(?) time.

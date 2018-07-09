@@ -1,0 +1,39 @@
+/*####################################*/
+## Machine Learning for Line Tracking ##
+/*####################################*/
+
+1. Take average values of light sensors for the surface
+that isn't part of the line. Update the average value when the error
+is zero and when the average changes significantly. The idea is that
+the average will stay more consistent on surfaces with a lot of variance
+in light reflectance. Such as the floor in the office or the or the speckled
+floors in Belk.
+
+2. If all sensors record a reading below/above a certain threshold that is
+ weighed against the average, then the average will change accordingly,
+ otherwise the average will be relatively the same. Similar to the I in PID, we want
+ the average to only change when there has been a significant time away from
+ the average.
+
+ 3. These steps will allow for not only variable background thresholds, but also
+ variable line thresholds. This way we can detect different colors of lines across
+ different backgrounds. By decreasing the threshold we can detect more minute
+ differences between the color of the background, and the color of the line, if
+ need be. Issues with this arise with the autonomous mode, as the smaller the
+ difference between the background and the line, the harder it is to not only
+ detect, but also to compensate for these changes with our movements. This has
+ led to erratic and rough movements.
+
+
+// Cushion value updates in real time
+
+Method 1. Record lowest sensor reading and highest sensor reading. Cushion
+value is the larger of the two?
+- Drawbacks: Cushion could be set to value of the line, so the error would
+never be recorded.
+- Solution: Use only the outside 4 sensors if starting on/near line. Value
+would then be guaranteed (almost) to not be the line.
+
+Method 2. Measure how much the average threshold value changes. Cushion would be the
+difference between the average and the set threshold?
+- Drawbacks: 
