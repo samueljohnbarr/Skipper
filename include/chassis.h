@@ -38,18 +38,18 @@ int getRightSpeed();
 int getLeftSpeed();
 
 /**
- * @return left encoder value
+ * Converts encoder value to centimeters
  */
-int getLeftEnc();
+int encToCm(int encVal);
 
 /**
- * @return right encoder value
+ * Converts centimeters to encoders
  */
-int getRightEnc();
+int cmToEnc(int cm);
 
 /**
- * Resets left and right encoders
- */
- void resetEncoders();
+* Moves the chassis until the encoder values are met
+*/
+void encChassisSet(int leftEnc, int rightEnc);
 
 #endif // _CHASSIS_H_

@@ -21,7 +21,7 @@ void printBinary(int n) {
 * i.e. 0110 1001 --> 1001 0110
 */
 char flipByte(char b) {
-  char r;
+  char r = 0;
   for (int i = 0; i < SHIFT; i++) {
     char temp = b & 0x01;
     r += temp;

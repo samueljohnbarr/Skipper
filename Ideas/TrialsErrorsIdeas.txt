@@ -1,14 +1,73 @@
 /**************************************************************\
-|**********************    July 06, 2018    *********************|
+|**********************    March 22, 2018    ******************|
 \**************************************************************/
-Wireless Transmission
--Split computer monitors for dual work on both robots instead of
- a joint effort on one
--Sam will work on the transmission side and Eli will work on the
- receiving side
--Once both sides are properly debugged, we will implement both sides
- to both bots and work further from there
--Created a wireless protocol text file to work from
+Self Preservation Algorithm
+  Currently, the algorithm splits the 360 point array into quadrants.
+  The first one set from 335 to 45.  If an object is within a defined
+  range, it will set that quadrant bit to 1, indicating there is an obstacle
+  in that quadrant. The robot is set to stop movement in that direction if
+  there is an obstacle in that quadrant. This works at low speeds, but at
+  higher speeds, it fails to see the object in time to stop.
+
+  Setting the defined range to a higher value forces the robot to stop even
+  if the seen object is out of the way of the robot.
+
+  **Goal: make range a variable, dependent on speed.
+          as range increases with speed, bounds on which define a quadrant
+          decrease
+          This variable dependency allows the robot to take action if and only
+          if there is an obstacle directly in its path.
+          (When turning, this range should be decreased so that it should only
+           stop if an object might hit the wheels)
+          WE GOT IT BOYS THIS IS IT
+
+/**************************************************************\
+|**********************    December 20, 2018    ****************|
+\**************************************************************/
+Obstacle Avoidance
+-Researching the best way to avoid obstacles
+  -Clustering: Finding points that are grouped together
+               and inserting those points into a structure.
+               The goal is for each obstacle to be
+               defined by a start point and an end point.
+
+     -Approach:  First find two points that are close to each other by
+                 Calculating the distance between them.
+                -If the distance is within a certain threshold, make a new
+                 cluster and insert those points.
+                -Create a linear function with those two points in the cluster.
+                -Plug in remaining points in the 'x' value of linear function -
+                 If the resulting 'y' is within a certain threshold, insert the point
+                 and remove the previous point - This way, we only keep track of
+                 endpoints.
+                -If the resulting 'y' is not within that threshold, compare the distance
+                 with that point and the one after to create a new cluster.
+
+    -Once clusters are formed, they will be the only information needed for
+     avoidance ???
+    -Implement a sweep-line algorithm for the clusters sorted on the y value and
+     keyed on the x value. Insert into BST if the x value is within the length of
+     the robot.
+
+
+/**************************************************************\
+|**********************    November 14, 2018    ****************|
+\**************************************************************/
+Roaming Capability
+-Tweaked patch distances - works as intended
+-Time testing of lidar decode shows a decode time of eiGHT SECONDS :O!
+-Shifting focus to heavily optimize lidar data retrieval and decode operations
+  -Goal is to combine getResponse and decode with as little reads/writes
+   to memory as possible
+
+/**************************************************************\
+|**********************    November 13, 2018    ****************|
+\**************************************************************/
+Roaming Capability
+-Mostly testing
+-Added patchDistances function
+ -Patches all zero (unreliable) points with data from closest points
+ -Goal is to improve path making decisions from getPath
 
  /**************************************************************\
 |**********************    July 05, 2018    *********************|
@@ -28,7 +87,7 @@ Wireless Transmission Layout
 - Made wireless transmission methods more abstract and privatized others
 - Developed a handshake transmit protocol to establish communication between the
   two devices and for the calling device to transmit
-- Implemented a state enum to keep track of the sending/revieving State
+- Implemented a state ENUM to keep track of the sending/receiving State
 - Practiced soldering :)
 
  /**************************************************************\

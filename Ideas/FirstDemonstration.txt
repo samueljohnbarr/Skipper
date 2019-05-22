@@ -1,0 +1,8 @@
+Demonstration:
+            Have Skipper roam the halls and avoid people/things in the process
+
+What is needed:
+
+1. Path Determination
+2. Obstacle Avoidance
+3.

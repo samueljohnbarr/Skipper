@@ -1,4 +1,3 @@
-#include "arm.h"
 #include "chassis.h"
 #include "lidar.h"
 #include "lineTrack.h"
@@ -7,211 +6,99 @@
 #include "movement.h"
 #include "print.h"
 #include "tools.h"
-#include "transfer.h"
+#include "wireless.h"
+#include "controller.h"
+#include "command.h"
+#include "lidarMap.h"
+#include "roam.h"
+#include "cluster.h"
+
 
 //int track = false;
 int inRangeOnce = 1;
-//int reps = 0;
+int lidarStatus = 1;
 int speed1 = 200;
-char read[360 * SCAN_DATA_LEN];
+char scan[360 * SCAN_DATA_LEN + HEADER_LENGTH + 1];
+unsigned int distances[FULL];
+char read[FULL];
 char head[HEADER_LENGTH];
 int readIndex = 0;
 int pCount = 0;
 char SCAN_HEAD[] = {0xA5, 0x5A, 0x05, 0x00, 0x00, 0x40, 0x81};
+int send[3];
+extern int currState;
 
-
-void leftBumpUpBotton() {
-
+void leftBumpUpButton() {
+  int * distances = lidarGetDistances();
+  setMap(distances);
+  initClusters(300, 120);
+  printClusters();
 }
 
 void leftBumpDownButton() {
-
+  int * distances = lidarGetDistances();
+  patchDistances(distances);
+  setMap(distances);
+  printMap();
 }
 
 void rightBumpUpButton() {
-
+  printf("Right: %d\n", encoderGet(rightEncoder));
+  printf("Left: %d\n\n", encoderGet(leftEncoder));
+  delay(500);
 }
 
 void rightBumpDownButton() {
-
+  int angle = findHeading();
+  printf("Path Angle: %d\n", angle);
 }
 
-void leftPadLeftButton(){
-  int count = fcount(uart1);
-  printf("Count: %d\n", count);
-  delay(500);
-  int numPoints = (count - 7) / 5;
-  char *ans = CHAR_MAL(HEADER_LENGTH + SCAN_DATA_LEN * numPoints + 1);
-  lidarScan(ans, &numPoints);
+void leftPadLeftButton() {
+  float x = atan(50/2.0) * (180.0/3.14159);
+  printf("degrees: %f\n", x);
+  printf("%f\n", round(2 * (x/10)));
 
-  for (int i = 0; i < SCAN_DATA_LEN * numPoints; i++) {
-    if (!(i % 5) && i != 0)
-      print("\n");
-    printf("%x | ", ans[i]);
-    delay(2);
-  }
-  print("\n");
-  printf("Accepted Points: %d", numPoints);
-
-  unsigned int *ians = UINT_MAL(SCAN_DATA_LEN * numPoints);
-
-  decodeScanResponse(ans, ians, SCAN_DATA_LEN * numPoints);
-
-  print("\n");
-  delay(500);
-  // free(ans);
 }
 
 
 
 
 void leftPadUpButton() {
-  printf("Start\n");
-  //lidarRequest();
-  //fputc(SCAN, uart1);
-  lidarExpressScan();
-  delay(500);
+  //lidarScan(NULL);
+  printf("Scanned\n");
+  int * dist = lidarGetDistances();
+  for (int i = 0; i < ANGLES; i++) {
+    printf("%d\n", dist[i]);
+    delay(20);
+  }
+  //lidarPrintDistances();
 }
 
 
 
 
 void leftPadRightButton() {
-  int printHead = true;
-  // Grab Header if header is currently null
-  if (head[1] != 0x5A) {
-    // Wait for buffer to fill
-    while (fcount(uart1) < 63)
-      delay(1);
-
-    // Grab header
-    for (int i = 0; i < HEADER_LENGTH; i++) {
-      head[i] = fgetc(uart1);
-    }
-  } else printHead = false;
-  // Get response length
-  int responseLen = (int)head[2];
-
-  // Create response array (only one packet for now)
-  char packet[responseLen];
-  int packIndex = 0;
-  while (!feof(uart1) && packIndex < responseLen) {
-    // Wait for lidar buffer to fill
-    while (fcount(uart1) < 63)
-      delayMicroseconds(500);
-    // Load packet
-    packet[packIndex++] = fgetc(uart1);
-  }
-
-  // Print Header
-  if (printHead) {
-    print("Header: ");
-    for (int i = 0; i < HEADER_LENGTH; i++) {
-      printf("%x | ", head[i]);
-    }
-  }
-
-  // Print Start info
-  print("\nStart Info: \n");
-  for (packIndex = 0; packIndex < 4; packIndex++) {
-    printf("%x | ", packet[packIndex]);
-  }
-
-  // Print Cabins
-  print("\n\nCabins:");
-  for (int i = packIndex; i < responseLen; i++) {
-    if (!((i - 4) % 5))
-      printf("\n%d: ", (i - 4) / 5 + 1);
-    printf("%x | ", packet[i]);
-  }
-
-  printf("\nCheckSum: %d\n",checkSum(packet));
-  delay(500);
+  int * distances = lidarGetDistances();
+  //patchDistances(distances);
+  //Create a map of x & y points
+  setMap(distances);
+  printMap();
 }
 
 
 
 
 
-
+//WHATI TODO:
 void leftPadDownButton() {
-  int numPoints = 150 * SCAN_DATA_LEN;
-  while (readIndex < numPoints && !feof(uart1)) {
-    // Get number of bytes to read
-    int count = fcount(uart1);
-    printf("Count: %d\n", count);
-    // If first index, take header into account
-    if (!readIndex)
-      count -= HEADER_LENGTH;
-    // Calc how many data packets to read
-    int numPoints = count / 5;
-    int numBytes = numPoints * SCAN_DATA_LEN;
-    char buf[numBytes]; //+1
-    // Grab header
-    if (!readIndex)
-      fread(head, 1, HEADER_LENGTH, uart1);
-    // Grab some packets
-    int i = 0;
-    while (i < numBytes) {
-      buf[i] = fgetc(uart1);
-      checkByteIntegrity(buf[i], &i);
-      while (fcount(uart1) < 63)
-        delayMicroseconds(500);
-    }
-    // Copy into data array
-    if (readIndex < 0)
-      readIndex = 0;
-    for (int i = 0; i < numBytes; i++) {
-      read[readIndex++] = buf[i];
-    }
-    if (feof(uart1))
-      printf("End of File");
-
-    // Wait for lidar buffer to fill
-    while (fcount(uart1) < 63)
-      delay(1);
-  }
-
-  // Print header
-  print("Header: ");
-  for (int i = 0; i < HEADER_LENGTH; i++)
-    printf("%x | ", head[i]);
-
-  // Print data packets
-  print("\nData:\n");
-  for (int i = 0; i < numPoints; i++) {
-    if (!(i % 5) && i != 0)
-      printf("\n%d: ", i / 5);
-    printf("%x | ", read[i]);
-    delay(2);
-  }
-  print("\n");
-
-  // Check inegrity
-  int p = numPoints / SCAN_DATA_LEN;
-  checkHeader(SCAN_HEAD, head, SCAN_DATA_LEN, 0);
-  checkScanIntegrity(read, &p);
-  printf("Accepted Points: %d", p);
-
-  unsigned int rArray[numPoints / SCAN_DATA_LEN];
-  decodeScanResponse(read, rArray, numPoints);
-  readIndex = -1;
-  delay(500);
+  encoderReset(rightEncoder);
+  encoderReset(leftEncoder);
+  printf("Reset\n");
 }
-
-
-
 
 
 void rightPadLeftButton() {
-  char test[] = {0xA5, 0x5A, 0x05, 0x00, 0x00, 0x40, 0x81, 0x01, 0x02,
-                 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A};
-  if (!checkHeader(SCAN_HEAD, test, SCAN_DATA_LEN, 2))
-    printf("Head find failure :(");
-  for (int i = 0; i < 10; i++) {
-    printf("%x | ", test[i]);
-  }
-  delay(500);
+  lidarPrintDistances();
 }
 
 
@@ -219,7 +106,7 @@ void rightPadLeftButton() {
 
 
 void rightPadUpButton() {
-      lidarReset();
+
 }
 
 
@@ -235,6 +122,32 @@ void rightPadRightButton() {
 
 
 void rightPadDownButton() {
-  //track = true;
-  // autonomous();
+  delay(500);
+  int power, turn;
+  while (!(joystickGetDigital(CONTROLLER, RIGHT_BUTT_SET, RIGHT_BUTT))) {
+    power = joystickGetAnalog(CONTROLLER, R_JOY_V);
+    if (power > -25 && power < 25)
+      power = 0;
+    turn = joystickGetAnalog(CONTROLLER, R_JOY_H);
+    if (turn > -25 && turn < 25)
+      turn = 0;
+
+    chassisSet(power + turn, power - turn);
+    //chassisSet(power, power);
+
+    while (joystickGetDigital(CONTROLLER, RIGHT_BUTT_SET, DOWN_BUTT)) {
+      //print("here\n");
+      roam();
+    }
+
+    if (joystickGetDigital(CONTROLLER, RIGHT_BUTT_SET, UP_BUTT)) {
+      delay(500);
+      printf("checksum: %x\n", getChecksum());
+    }
+    if (joystickGetDigital(CONTROLLER, LEFT_BUTT_SET, RIGHT_BUTT)) {
+      int * distances = lidarGetDistances();
+      printf("Desired Angle: %d\n",getPath(280, 160, distances) % 360);
+      delay(500);
+    }
+  }
 }

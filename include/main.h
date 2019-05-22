@@ -26,8 +26,9 @@
 #define MAIN_H_
 
 #include <API.h>
+#include <math.h>
+#include <string.h>
 #include "main.h"
-#include "arm.h"
 #include "chassis.h"
 #include "lineTrack.h"
 // Allow usage of this file in C++ programs
@@ -41,12 +42,17 @@ extern "C" {
 #define IME_ELBOW 1
 #define NUMBER_OF_IME 2
 
+#define CHASSIS_SET 24
+
 #define LEFT_BUTT_SET 7
 #define RIGHT_BUTT_SET 8
+
 #define LEFT_BUMP 5
 #define RIGHT_BUMP 6
 #define LIMOTOR 6
+
 #define LED 5
+#define LED_RED 11
 
 #define R_JOY_H 1
 #define R_JOY_V 2
@@ -60,16 +66,31 @@ extern "C" {
 
 #define CONTROLLER 1
 
-#define LED_RED 11
+#define ANGLES 360
+#define FULL 360
+#define HALF 180
+#define QUARTER 90
+#define SIXTH 60
+
+#define NORTH 0
+#define SOUTH 1
+#define EAST 2
+#define WEST 3
+#define NORTHEAST 4
+#define NORTHWEST 5
+#define SOUTHEAST 6
+#define SOUTHWEST 7
 
 #define CHAR_MAL(x) (char *)malloc(sizeof(char)*x)
 #define INT_MAL(x) (int *)malloc(sizeof(int)*x)
 #define UINT_MAL(x) (unsigned int *)malloc(sizeof(unsigned int)*x)
+#define CLUST_MAL() (struct Cluster *) malloc(sizeof(struct Cluster))
+
 Ultrasonic sonar;
 Encoder rightEncoder;
 Encoder leftEncoder;
-
-
+TaskHandle wireless;
+TaskHandle lidar;
 //
 /**
  * Runs the user autonomous code. This function will be started in its own task with the default

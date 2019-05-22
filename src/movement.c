@@ -1,6 +1,5 @@
 #include "main.h"
 #include "chassis.h"
-#include "arm.h"
 #include "print.h"
 
 int speed = 120;
@@ -12,6 +11,7 @@ int printCount;
 int* tc;
 int cush;
 
+/*
 void dance() {
   unsigned long t = 5000;
   chassisSet(speed, -speed);
@@ -26,7 +26,7 @@ void dance() {
   shoulderPotSet(1200, 30);
   clawGrab();
 }
-
+*/
 void backUpProcedure() {
   chassisSet(90,-90);
   delay(2000);

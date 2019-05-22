@@ -1,0 +1,55 @@
+void decodeScanResponse(char *dataArray, unsigned int *rArray, int size) {
+  int elements = ceil(size / 5.0);
+  int *quality = INT_MAL(elements);
+  char *angles1 = CHAR_MAL(elements);
+  char *angles2 = CHAR_MAL(elements);
+  char *distances1 = CHAR_MAL(elements);
+  char *distances2 = CHAR_MAL(elements);
+  int dSize = size + 7;
+  // Decode data array into corresponding byte arrays
+  for (int i = 0; i < dSize; i++) {
+    if (i < 7)
+      header[i] = dataArray[i];
+    else {
+      // Quality byte
+      if ((i % 5) == 2) quality[i / 5] = (int) dataArray[i] >> 2;
+
+      // Angle bytes
+      if ((i % 5) == 3) angles1[i / 5] = dataArray[i];
+      if ((i % 5) == 4) angles2[i / 5] = dataArray[i];
+
+      // Distance bytes
+      if ((i % 5) == 0) distances1[i / 5] = dataArray[i];
+      if ((i % 5) == 1) distances2[i / 5] = dataArray[i];
+    }
+  }
+
+  // Conjoin angle and distance arrays
+  unsigned int *angles = UINT_MAL(elements);
+  unsigned int *distances = UINT_MAL(elements);
+
+  for (int i = 0; i < elements; i++) {
+    // Join char arrays into integer array
+    angles[i] = ((shiftAdd(angles2[i], angles1[i])) >> 1) / 64;
+    distances[i] = (shiftAdd(distances2[i], distances1[i])) / 40;
+  }
+
+  // Conjoin angle and distance arrays into return array
+  for (int i = 0; i < elements; i++) {
+    if (angles[i] > 359) {
+      printf("Angle out of bounds\n");
+      printf("Angle: %u | Distance: %u\n\n", angles[i], distances[i]);
+    } else {
+      printf("Accepted Angle :)\n");
+      printf("Quality: %d | Angle: %u | Distance: %u\n\n",
+               quality[i], angles[i], distances[i]);
+      rArray[angles[i]] = distances[i];
+      delay(5);
+    }
+  }
+  free(quality);
+  free(angles1);
+  free(angles2);
+  free(distances1);
+  free(distances2);
+}

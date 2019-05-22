@@ -1,7 +1,12 @@
 #ifndef _CONTROLLER_
 #define _CONTROLLER_
 
-void leftBumpUpBotton();
+/**
+* Class used to map buttons to methods in order to clean up
+* the code in main.
+*/
+
+void leftBumpUpButton();
 
 void leftBumpDownButton();
 
